@@ -8,8 +8,58 @@ var head = {
         "Access-Control-Max-Age": 2592000, // 30 days
         "Access-Control-Allow-Headers":"Origin, X-Requested-With, Content-Type, Accept, Authorization"
       };
+      
+
+function ls(req, res, dir)
+{
+  fs.readdir(dir, (err, files) => 
+        {
+          if (err) 
+          {
+            throw err;
+          }
+          
+          
+          var stats=[];
+          
+          for(var i=0;i<files.length;i++)
+          {
+            var stat=fs.statSync(dir+files[i]);
+            //console.log(stat);
+            stats.push({
+              name: files[i],
+              directory: stat.isDirectory(),
+              size:stat.size,
+              createDate:stat.ctime,
+              modifiedDate:stat.mtime
+             });
+              
+            
+          }
+          
+          var head = {
+             'Content-Type': mime.lookup(".json")
+          };
+          res.writeHead(200, head);
+          res.write(JSON.stringify(stats));
+          res.end();
+          
+          
+          
+        });
+  
+  
+}
+
+function readfile(req, res, path)
+{
+  
+  
+}
 
 
+
+      
 http.createServer(function (req, res) 
 {
   
@@ -20,8 +70,46 @@ http.createServer(function (req, res)
   }
   
   var url =   decodeURI(req.url.toString());
+  
+  console.log(url);
+  
+  
+  if(url.startsWith("/@sys"))
+    {
+      url = url.substring(5, url.length);
+      
+      console.log(url);
+      
+      if(url.startsWith("/ls"))
+      {
+        var dir="."+url.substring(3,url.length);
+        console.log(dir);
+        ls(req, res, dir);
+        
+        
+      }
+      
+      return;
+      
+    }
+  
+  
+  
+  
+  
+  
+  //console.log(url);
     if(url.endsWith("/"))url+="index.html";
     url=url.substring(1,url.length);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     fs.stat(url, function(err, stat)
     {
       if(err)
