@@ -53,7 +53,7 @@ function ls(req, res, dir)
 
 function readfile(req, res, path)
 {
-  
+  //chekcout
   
 }
 
